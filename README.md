@@ -1,6 +1,7 @@
-# ikea
+# lightbulb
 
-> fill your house
+> illuminate your house
+> hosted on https://lit.lighting
 
 ## Getting started
 
