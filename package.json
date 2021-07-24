@@ -1,0 +1,38 @@
+{
+  "name": "tray",
+  "version": "0.1.0",
+  "main": "",
+  "scripts": {
+    "dev": "NODE_OPTIONS='--inspect' next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@stripe/react-stripe-js": "^1.1.2",
+    "@stripe/stripe-js": "^1.9.0",
+    "@zeit/next-css": "^1.0.1",
+    "abab": "^2.0.5",
+    "add": "^2.0.6",
+    "friendly-words": "^1.1.10",
+    "got": "^11.8.0",
+    "nanoid": "^3.1.10",
+    "next": "^10.0.0",
+    "node-fetch": "^2.6.0",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-number-format": "^4.4.1",
+    "react-textarea-autosize": "^8.2.0",
+    "stripe": "^8.78.0",
+    "theme-ui": "^0.3.1",
+    "yarn": "^1.22.5"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.10.4",
+    "@types/node": "^14.0.24",
+    "@types/react": "^16.9.43",
+    "babel-jest": "^26.1.0",
+    "jest": "^26.1.0",
+    "typescript": "^3.9.7"
+  }
+}
