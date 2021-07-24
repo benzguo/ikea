@@ -1,10 +1,13 @@
 # lightbulb
 
 > illuminate your house
-> hosted on https://lit.lighting
 
-## Getting started
+## https://lit.lighting
 
-- (OPTIONAL) Create an `.env.local` file
+## Running locally
+
 - Install dependencies: `yarn`
 - Run dev: `yarn dev`
+- (OPTIONAL) Create an `.env.local` file
+
+## .env.local
