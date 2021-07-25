@@ -11,6 +11,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const accountId = params.account_id;
   const amount = params.amount;
   const message = params.message;
+  const flow = params.flow;
 
   const returnUrl = req.headers.referer;
 
@@ -21,32 +22,109 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     productData['description'] = message;
   }
 
-  // create checkout session
-  const checkoutParams = {
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: productData,
-          unit_amount: ~~(amount * 100),
-        },
-        quantity: 1,
-      },
-    ],
-    mode: 'payment',
-    payment_intent_data: {
-      description: message,
-    },
-    success_url: returnUrl,
-    cancel_url: returnUrl,
-    submit_type: 'donate',
-  };
-
   try {
-    const checkoutSession = await stripe.checkout.sessions.create(checkoutParams, {
-      stripeAccount: accountId,
-    });
+    var checkoutSession = null;
+    if (flow === 'direct') {
+      const checkoutParams = {
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: productData,
+              unit_amount: ~~(amount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        payment_intent_data: {
+          application_fee_amount: 10,
+          description: message,
+        },
+        success_url: returnUrl,
+        cancel_url: returnUrl,
+        submit_type: 'donate',
+      };
+      checkoutSession = await stripe.checkout.sessions.create(checkoutParams, {
+        stripeAccount: accountId,
+      });
+    } else if (flow === 'destination') {
+      const checkoutParams = {
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: productData,
+              unit_amount: ~~(amount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        payment_intent_data: {
+          application_fee_amount: 10,
+          description: message,
+          transfer_data: {
+            destination: accountId,
+          },
+        },
+        success_url: returnUrl,
+        cancel_url: returnUrl,
+        submit_type: 'donate',
+      };
+      checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
+    } else if (flow === 'destination_obo') {
+      const checkoutParams = {
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: productData,
+              unit_amount: ~~(amount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        payment_intent_data: {
+          application_fee_amount: 10,
+          description: message,
+          on_behalf_of: accountId,
+          transfer_data: {
+            destination: accountId,
+          },
+        },
+        success_url: returnUrl,
+        cancel_url: returnUrl,
+        submit_type: 'donate',
+      };
+      checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
+    } else if (flow === 'sct') {
+      const checkoutParams = {
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: productData,
+              unit_amount: ~~(amount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        payment_intent_data: {
+          description: message,
+        },
+        success_url: returnUrl,
+        cancel_url: returnUrl,
+        submit_type: 'donate',
+      };
+      checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
+    }
     const checkoutSessionId = checkoutSession.id;
     res.json({ id: checkoutSessionId, url: checkoutSession.url });
   } catch (e) {

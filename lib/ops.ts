@@ -37,8 +37,36 @@ export const getAccount = async (secretKey: string, accountId: string | null): P
   const stripe = require('stripe')(secretKey);
 
   try {
-    const account = await stripe.accounts.retrieve(accountId);
+    let account = null;
+    if (accountId) {
+      account = await stripe.accounts.retrieve(accountId);
+    } else {
+      account = await stripe.accounts.retrieve();
+    }
     dataResponse = { account: account };
+  } catch (e) {
+    errorResponse = {
+      httpStatus: 500,
+      errorMessage: e.message,
+      errorCode: 'stripe_exception',
+    };
+  }
+  const response = {
+    errored: errorResponse != null,
+    data: errorResponse ? errorResponse : dataResponse,
+  };
+  console.log('response', response);
+  return response;
+};
+
+export const getCheckoutSession = async (secretKey: string, sessionId: string): Promise<AnyResponse> => {
+  let dataResponse: object | null = null;
+  let errorResponse: ErrorResponse | null = null;
+  const stripe = require('stripe')(secretKey);
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['payment_intent'] });
+    dataResponse = { session: session };
   } catch (e) {
     errorResponse = {
       httpStatus: 500,

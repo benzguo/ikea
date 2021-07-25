@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import NumberFormat from 'react-number-format';
-import { Box, Card, Button, Text, Flex, Input, Badge, Textarea } from 'theme-ui';
+import { Box, Card, Button, Text, Flex, Input, Badge, Textarea, Radio, Label } from 'theme-ui';
 import BlockTextarea from '../components/BlockTextarea';
 import fetchJson from '../lib/fetchJson';
 
 const HomePage = (props) => {
   const [account, setAccount] = useState<object | null>(null);
+  const [platform, setPlatform] = useState<object | null>(null);
+  const [checkoutSession, setCheckoutSession] = useState<object | null>(null);
   const [accountId, setAccountId] = useState<string>('');
   const [secretKey, setSecretKey] = useState<string>('');
+  const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const radioRef = useRef<HTMLInputElement | null>(null);
   const [amount, setAmount] = useState(0.5);
 
   const isValidSecretKey = (key: string): boolean => {
@@ -21,12 +25,78 @@ const HomePage = (props) => {
   };
 
   useEffect(() => {
+    setCheckoutSessionId(localStorage.getItem('checkout_session_id'));
     setAccountId(localStorage.getItem('account_id'));
-    if (isValidAccountId(accountId)) {
-      fetchAccount();
-    }
     setSecretKey(localStorage.getItem('secret_key'));
   }, []);
+
+  useEffect(() => {
+    if (isValidAccountId(accountId)) {
+      fetchAccount();
+      localStorage.setItem('account_id', accountId);
+    }
+    if (isValidSecretKey(secretKey)) {
+      fetchPlatform();
+      localStorage.setItem('secret_key', secretKey);
+    }
+    if (checkoutSessionId) {
+      fetchCheckoutSession();
+      localStorage.setItem('checkout_session_id', checkoutSessionId);
+    }
+    if (!accountId || accountId.length === 0) {
+      localStorage.setItem('account_id', '');
+    }
+    if (!secretKey || secretKey.length === 0) {
+      localStorage.setItem('secret_key', '');
+    }
+  }, [accountId, secretKey, checkoutSessionId]);
+
+  const handleCheckout = async (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    const body = {
+      amount: amount,
+      message: inputRef.current.value,
+      secret_key: secretKey,
+      account_id: accountId,
+      flow: radioRef.current.value,
+    };
+    let checkoutSessionUrl = null;
+    try {
+      const response = await fetchJson('/api/create_checkout_session', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      });
+      checkoutSessionUrl = response.url;
+      localStorage.setItem('checkout_session_id', checkoutSessionId);
+      setCheckoutSessionId(response.id);
+    } catch (e) {
+      // TODO: handle errors (in this entire function)
+      console.error(e);
+      return;
+    }
+
+    if (!checkoutSessionUrl) {
+      console.error('create checkout session failed');
+      return;
+    }
+
+    window.location.assign(checkoutSessionUrl);
+  };
+
+  const fetchPlatform = async () => {
+    try {
+      let url = `/api/accounts/${secretKey}`;
+      const response = await fetchJson(url, {
+        method: 'GET',
+      });
+      setPlatform(response.account);
+    } catch (e) {
+      console.error(e);
+      return;
+    }
+  };
 
   const fetchAccount = async () => {
     try {
@@ -41,46 +111,17 @@ const HomePage = (props) => {
     }
   };
 
-  useEffect(() => {
-    if (isValidAccountId(accountId)) {
-      fetchAccount();
-      localStorage.setItem('account_id', accountId);
-    }
-    if (isValidSecretKey(secretKey)) {
-      localStorage.setItem('secret_key', secretKey);
-    }
-    if (!accountId || accountId.length === 0) {
-      localStorage.setItem('account_id', '');
-    }
-    if (!secretKey || secretKey.length === 0) {
-      localStorage.setItem('secret_key', '');
-    }
-  }, [accountId, secretKey]);
-
-  const handleCheckout = async (e) => {
-    if (e) {
-      e.preventDefault();
-    }
-    const body = { amount: amount, message: inputRef.current.value, secret_key: secretKey, account_id: accountId };
-    let checkoutSessionUrl = null;
+  const fetchCheckoutSession = async () => {
     try {
-      const response = await fetchJson('/api/create_checkout_session', {
-        method: 'POST',
-        body: JSON.stringify(body),
+      let url = `/api/checkout_sessions/${secretKey}/${checkoutSessionId}`;
+      const response = await fetchJson(url, {
+        method: 'GET',
       });
-      checkoutSessionUrl = response.url;
+      setCheckoutSession(response.session);
     } catch (e) {
-      // TODO: handle errors (in this entire function)
       console.error(e);
       return;
     }
-
-    if (!checkoutSessionUrl) {
-      console.error('create checkout session failed');
-      return;
-    }
-
-    window.location.assign(checkoutSessionUrl);
   };
 
   return (
@@ -110,6 +151,11 @@ const HomePage = (props) => {
                 setSecretKey(t.target.value);
               }}
             />
+            {platform && (
+              <Badge mx={3} bg={'blue'}>
+                {platform['settings']['dashboard']['display_name']}
+              </Badge>
+            )}
             {isValidSecretKey(secretKey) && (
               <Box>
                 {!isValidAccountId(accountId) && (
@@ -149,7 +195,7 @@ const HomePage = (props) => {
                 {account && (
                   <Textarea
                     rows={15}
-                    value={JSON.stringify(account, null, 2)}
+                    defaultValue={JSON.stringify(account, null, 2)}
                     sx={{ borderColor: 'lightGray', bg: 'lightBlue' }}
                   />
                 )}
@@ -282,6 +328,40 @@ const HomePage = (props) => {
                       my={1}
                       ref={inputRef}
                     />
+                    <Label>
+                      <Radio name="flow" value="direct" defaultChecked={true} ref={radioRef} />
+                      Direct
+                    </Label>
+                    <Label>
+                      <Radio name="flow" value="destination" ref={radioRef} />
+                      Destination
+                    </Label>
+                    <Label>
+                      <Radio name="flow" value="destination_obo" ref={radioRef} />
+                      Destination On behalf of
+                    </Label>
+                    <Label>
+                      <Radio name="flow" value="sct" ref={radioRef} />
+                      Separate Charge
+                    </Label>
+                    {checkoutSession && (
+                      <>
+                        <Text mt={3}>⚠️ Run this to send a transfer after Separate Charge</Text>
+                        {
+                          <Textarea
+                            rows={10}
+                            sx={{ borderColor: 'lightGray', bg: 'lightBlue' }}
+                            defaultValue={`curl https://api.stripe.com/v1/transfers \\ 
+-u ${secretKey}: \\
+-d amount=${checkoutSession['payment_intent']['charges']['data'][0]['amount']} \\
+-d currency="usd" \\
+-d description="transfer description" \\
+-d source_transaction="${checkoutSession['payment_intent']['charges']['data'][0]['id']}" \\ 
+-d destination="${accountId}"`}
+                          />
+                        }
+                      </>
+                    )}
                   </Box>
                 </>
               )}
