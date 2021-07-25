@@ -12,10 +12,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const returnUrl = req.headers.referer;
 
-  let stripeKey = process.env.LOCAL_STRIPE_SECRET_KEY;
+  let stripeKey = process.env.SECRET_KEY;
   const stripe = require('stripe')(stripeKey);
 
-  const stripeAccountId = process.env.LOCAL_CONNECTED_ACCOUNT_ID;
+  const stripeAccountId = process.env.ACCOUNT_ID;
 
   const productData = { name: 'tip' };
   if (message) {

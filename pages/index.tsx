@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import PaymentBlock from '../components/PaymentBlock';
-import { Box, Card, Button, Text } from 'theme-ui';
+import { Box, Card, Button, Text, Input } from 'theme-ui';
 import fetchJson from '../lib/fetchJson';
 
-const UserPage = (props) => {
+const HomePage = (props) => {
   return (
     <>
       <Layout>
-        <PaymentBlock stripeAccount={{ id: process.env.LOCAL_CONNECTED_ACCOUNT_ID }} />
+        <PaymentBlock stripeAccount={{ id: process.env.ACCOUNT_ID }} />
         <Card variant="card_dotted_gray" sx={{ my: 4 }}>
           <Box sx={{ mb: 3 }}>
             <Box
@@ -22,6 +22,7 @@ const UserPage = (props) => {
               }}
             >
               <>
+                <Input />
                 <Button
                   variant="button_med"
                   mr={2}
@@ -88,4 +89,4 @@ const UserPage = (props) => {
   );
 };
 
-export default UserPage;
+export default HomePage;

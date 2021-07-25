@@ -3,18 +3,15 @@ import { ErrorResponse, AnyResponse } from './typedefs';
 export const connectStripeAccount = async (): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(process.env.LOCAL_STRIPE_SECRET_KEY);
+  const stripe = require('stripe')(process.env.SECRET_KEY);
 
-  let stripeAccountId = process.env.LOCAL_CONNECTED_ACCOUNT_ID;
+  let stripeAccountId = process.env.ACCOUNT_ID;
   console.log('stripe_account_id: ' + stripeAccountId);
-  const email = process.env.CONNECTED_ACCOUNT_EMAIL;
   try {
     console.log('Creating Stripe account');
     const account = await stripe.accounts.create({
       type: 'express',
       business_type: 'individual',
-      email: email,
-      individual: { email: email },
       settings: {
         payments: {
           statement_descriptor: 'fill your home',
@@ -35,7 +32,7 @@ export const connectStripeAccount = async (): Promise<AnyResponse> => {
   const account = await stripe.accounts.retrieve(stripeAccountId);
   // create an account link if charges aren't enabled
   if (!account.charges_enabled) {
-    let returnUrl = `https://lit.lighting`;
+    let returnUrl = `http://lit.lighting`;
     if (process.env.NODE_ENV === 'development') {
       returnUrl = `http://127.0.0.1:3000`;
     }
@@ -71,8 +68,8 @@ export const connectStripeAccount = async (): Promise<AnyResponse> => {
 export const createLoginLink = async (): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(process.env.LOCAL_STRIPE_SECRET_KEY);
-  let stripeAccountId = process.env.LOCAL_CONNECTED_ACCOUNT_ID;
+  const stripe = require('stripe')(process.env.SECRET_KEY);
+  let stripeAccountId = process.env.ACCOUNT_ID;
   const account = await stripe.accounts.retrieve(stripeAccountId);
   try {
     console.log('Creating login link');
