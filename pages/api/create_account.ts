@@ -1,12 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { connectStripeAccount } from '../../lib/ops';
+import { createAccount } from '../../lib/ops';
 import { ErrorResponse } from '../../lib/typedefs';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return;
   }
-  const response = await connectStripeAccount();
+  const params = JSON.parse(req.body);
+  const secretKey = params.secret_key;
+
+  const response = await createAccount(secretKey);
   if (response.errored) {
     const errorResponse: ErrorResponse = {
       errorCode: 'op_error',

@@ -54,9 +54,9 @@ export default {
       px: 2,
       py: 1,
       color: 'text',
-      border: 'solid 1px lightGray',
+      border: 'solid 1px black',
       borderWidth: 1,
-      bg: 'transparent',
+      bg: 'lightBlue',
       fontSize: 1,
       fontFamily: 'mono',
       cursor: 'pointer',
@@ -113,11 +113,11 @@ export default {
       bg: 'white',
     },
     card_dotted_gray: {
-      p: 3,
+      p: 1,
       border: '1px dotted',
       borderColor: 'lightGray',
       borderRadius: 8,
-      bg: 'transparent',
+      bg: 'lightGray',
     },
     card_dotted_black: {
       p: 3,
@@ -155,7 +155,8 @@ export default {
       borderWidth: 0,
       textAlign: 'center',
       fontFamily: 'mono',
-      py: 2,
+      py: 1,
+      border: '1px solid lightGray',
     },
     input_standard: {
       fontFamily: 'mono',
@@ -167,6 +168,7 @@ export default {
     input_payment_message: {
       fontFamily: 'mono',
       fontSize: 3,
+      border: '1px solid lightGray',
     },
     label_icon_button: {
       fontSize: 0,

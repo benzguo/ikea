@@ -7,15 +7,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const params = JSON.parse(req.body);
+  const secretKey = params.secret_key;
+  const accountId = params.account_id;
   const amount = params.amount;
   const message = params.message;
 
   const returnUrl = req.headers.referer;
 
-  let stripeKey = process.env.SECRET_KEY;
-  const stripe = require('stripe')(stripeKey);
-
-  const stripeAccountId = process.env.ACCOUNT_ID;
+  const stripe = require('stripe')(secretKey);
 
   const productData = { name: 'tip' };
   if (message) {
@@ -30,7 +29,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         price_data: {
           currency: 'usd',
           product_data: productData,
-          unit_amount: amount,
+          unit_amount: ~~(amount * 100),
         },
         quantity: 1,
       },
@@ -46,7 +45,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const checkoutSession = await stripe.checkout.sessions.create(checkoutParams, {
-      stripeAccount: stripeAccountId,
+      stripeAccount: accountId,
     });
     const checkoutSessionId = checkoutSession.id;
     res.json({ id: checkoutSessionId, url: checkoutSession.url });
