@@ -343,6 +343,9 @@ const HomePage = (props) => {
                       <Radio name="flow" value="sct" ref={radioRef} />
                       Separate Charge (and Transfer with cURL)
                     </Label>
+                    {checkoutSession && <><Badge sx={{bg: 'green'}}>{checkoutSession['payment_intent']['id']}</Badge> 
+                    <Link href={`https://dashboard.stripe.com/payments/${checkoutSession['payment_intent']['id']}`} sx={{pl: 2, fontSize: 1}}>{`view last payment in Stripe Dashboard`}</Link>
+                    </>}
                     {checkoutSession && (
                       <>
                         <Text mt={3}>⚠️ Run this to send a transfer after Separate Charge</Text>
