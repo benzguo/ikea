@@ -13,7 +13,7 @@ const HomePage = (props) => {
   const [secretKey, setSecretKey] = useState<string>('');
   const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const radioRef = useRef<HTMLInputElement | null>(null);
+  const [flow, setFlow] = useState<string>('direct');
   const [amount, setAmount] = useState(0.5);
 
   const isValidSecretKey = (key: string): boolean => {
@@ -31,7 +31,7 @@ const HomePage = (props) => {
   }, []);
 
   useEffect(() => {
-    if (isValidAccountId(accountId)) {
+    if (isValidSecretKey(secretKey) && isValidAccountId(accountId)) {
       fetchAccount();
       localStorage.setItem('account_id', accountId);
     }
@@ -39,7 +39,7 @@ const HomePage = (props) => {
       fetchPlatform();
       localStorage.setItem('secret_key', secretKey);
     }
-    if (checkoutSessionId) {
+    if (isValidSecretKey(secretKey) && checkoutSessionId) {
       fetchCheckoutSession();
       localStorage.setItem('checkout_session_id', checkoutSessionId);
     }
@@ -60,8 +60,9 @@ const HomePage = (props) => {
       message: inputRef.current.value,
       secret_key: secretKey,
       account_id: accountId,
-      flow: radioRef.current.value,
+      flow: flow
     };
+    console.log(body);
     let checkoutSessionUrl = null;
     try {
       const response = await fetchJson('/api/create_checkout_session', {
@@ -328,37 +329,38 @@ const HomePage = (props) => {
                     </Flex>
                     <Input name="message" id="message" placeholder="Description" my={1} ref={inputRef} />
                     <Label>
-                      <Radio name="flow" value="direct" defaultChecked={true} ref={radioRef} />
+                      <Radio name="flow" value="direct" defaultChecked={true} onChange={(event) => {setFlow(event.target.value)}} />
                       Direct
                     </Label>
                     <Label>
-                      <Radio name="flow" value="destination" ref={radioRef} />
+                      <Radio name="flow" value="destination" onChange={(event) => {setFlow(event.target.value)}} />
                       Destination
                     </Label>
                     <Label>
-                      <Radio name="flow" value="destination_obo" ref={radioRef} />
+                      <Radio name="flow" value="destination_obo" onChange={(event) => {setFlow(event.target.value)}} />
                       Destination On behalf of
                     </Label>
                     <Label>
-                      <Radio name="flow" value="sct" ref={radioRef} />
+                      <Radio name="flow" value="sct" onChange={(event) => {setFlow(event.target.value)}} />
                       Separate Charge (and Transfer with cURL)
                     </Label>
-                    {checkoutSession && <><Badge sx={{bg: 'green'}}>{checkoutSession['payment_intent']['id']}</Badge> 
-                    <Link href={`https://dashboard.stripe.com/payments/${checkoutSession['payment_intent']['id']}`} sx={{pl: 2, fontSize: 1}}>{`view last payment in Stripe Dashboard`}</Link>
-                    </>}
-                    {checkoutSession && (
+                    {checkoutSession && <Box> 
+                      <Badge sx={{bg: 'green'}}>{checkoutSession['payment_intent']['id']}</Badge> 
+                      <Link href={`https://dashboard.stripe.com/payments/${checkoutSession['payment_intent']['id']}`} sx={{pl: 2, fontSize: 1}}>{`view last payment in Stripe Dashboard`}</Link>
+                    </Box>}
+                    {checkoutSession && checkoutSession['payment_intent'] && checkoutSession['payment_intent']['charges'] && checkoutSession['payment_intent']['charges']['data'] && (
                       <>
                         <Text mt={3}>⚠️ Run this to send a transfer after Separate Charge</Text>
                         {
                           <Textarea
                             rows={7}
                             sx={{ borderColor: 'lightGray', bg: 'lightBlue' }}
-                            defaultValue={`curl https://api.stripe.com/v1/transfers \\ 
+                            defaultValue={`curl https://api.stripe.com/v1/transfers \\
 -u ${secretKey}: \\
 -d amount=${checkoutSession['payment_intent']['charges']['data'][0]['amount']} \\
 -d currency="usd" \\
 -d description="transfer description" \\
--d source_transaction="${checkoutSession['payment_intent']['charges']['data'][0]['id']}" \\ 
+-d source_transaction="${checkoutSession['payment_intent']['charges']['data'][0]['id']}" \\
 -d destination="${accountId}"`}
                           />
                         }

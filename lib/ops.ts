@@ -82,6 +82,145 @@ export const getCheckoutSession = async (secretKey: string, sessionId: string): 
   return response;
 };
 
+export const createCheckoutSession = async (secretKey: string, accountId: string, amount: number, message: string | null, flow: string): Promise<AnyResponse> => {
+  let dataResponse: object | null = null;
+  let errorResponse: ErrorResponse | null = null;
+  const stripe = require('stripe')(secretKey);
+
+  console.log("🌊 flow", flow)
+  let returnUrl = `https://lit.lighting`;
+  if (process.env.NODE_ENV === 'development') {
+    returnUrl = `http://127.0.0.1:3000`;
+  }
+  try {
+    console.log('Creating account link ' + returnUrl);
+    const productData = { name: 'tip' };
+    if (message) {
+      productData['description'] = message;
+    }
+    var checkoutSession = null;
+    if (flow === 'direct') {
+      const checkoutParams = {
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: productData,
+              unit_amount: ~~(amount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        payment_intent_data: {
+          application_fee_amount: 10,
+          description: message,
+        },
+        success_url: returnUrl,
+        cancel_url: returnUrl,
+        submit_type: 'donate',
+      };
+      console.log("params", checkoutParams);
+      checkoutSession = await stripe.checkout.sessions.create(checkoutParams, {
+        stripeAccount: accountId,
+      });
+    } else if (flow === 'destination') {
+      const checkoutParams = {
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: productData,
+              unit_amount: ~~(amount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        payment_intent_data: {
+          application_fee_amount: 10,
+          description: message,
+          transfer_data: {
+            destination: accountId,
+          },
+        },
+        success_url: returnUrl,
+        cancel_url: returnUrl,
+        submit_type: 'donate',
+      };
+      console.log("params", checkoutParams);
+      checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
+    } else if (flow === 'destination_obo') {
+      const checkoutParams = {
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: productData,
+              unit_amount: ~~(amount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        payment_intent_data: {
+          application_fee_amount: 10,
+          description: message,
+          on_behalf_of: accountId,
+          transfer_data: {
+            destination: accountId,
+          },
+        },
+        success_url: returnUrl,
+        cancel_url: returnUrl,
+        submit_type: 'donate',
+      };
+      console.log("params", checkoutParams);
+      checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
+    } else if (flow === 'sct') {
+      const checkoutParams = {
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: productData,
+              unit_amount: ~~(amount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        payment_intent_data: {
+          description: message,
+        },
+        success_url: returnUrl,
+        cancel_url: returnUrl,
+        submit_type: 'donate',
+      };
+      console.log("params", checkoutParams);
+      checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
+    }
+    const checkoutSessionId = checkoutSession.id;
+    dataResponse = { id: checkoutSessionId, url: checkoutSession.url };
+  } catch (e) {
+    errorResponse = {
+      httpStatus: 500,
+      errorMessage: e.message,
+      errorCode: 'stripe_exception',
+    };
+  }
+  const response = {
+    errored: errorResponse != null,
+    data: errorResponse ? errorResponse : dataResponse,
+  };
+  console.log('response', response);
+  return response;
+};
+
 export const createAccountLink = async (secretKey: string, accountId: string): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;

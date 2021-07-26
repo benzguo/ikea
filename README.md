@@ -2,7 +2,7 @@
 
 > illuminate your house
 
-## http://lit.lighting
+## https://lit.lighting
 
 ## Running locally
 
