@@ -149,7 +149,7 @@ export default {
     },
     input: {
       // PaymentBlock amount input
-      fontSize: 5,
+      fontSize: 3,
       fontWeight: 'bold',
       bg: 'transparent',
       borderWidth: 0,
@@ -165,10 +165,8 @@ export default {
       py: 2,
       border: '1px solid lightGray',
     },
-    input_payment_message: {
-      fontFamily: 'mono',
+    label: {
       fontSize: 3,
-      border: '1px solid lightGray',
     },
     label_icon_button: {
       fontSize: 0,

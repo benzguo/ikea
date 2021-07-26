@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import NumberFormat from 'react-number-format';
-import { Box, Card, Button, Text, Flex, Input, Badge, Textarea, Radio, Label } from 'theme-ui';
+import { Box, Card, Button, Text, Flex, Input, Badge, Textarea, Radio, Label, Link } from 'theme-ui';
 import BlockTextarea from '../components/BlockTextarea';
 import fetchJson from '../lib/fetchJson';
 
@@ -127,9 +127,10 @@ const HomePage = (props) => {
   return (
     <>
       <Layout>
-        <Card variant="card_dotted_gray" sx={{ my: 4, textAlign: 'center', fontSize: 35 }}>
-          💡
-        </Card>
+        <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>💡 lightbulb</Text>
+        <Link sx={{ fontSize: 1, pb: 1, py: 0, my: 0 }} href="https://github.com/benzguo/lightbulb">
+          source
+        </Link>
         <Card variant="card_dotted_gray" sx={{ my: 4 }}>
           <Box
             sx={{
@@ -141,7 +142,8 @@ const HomePage = (props) => {
               bg: 'offWhite',
             }}
           >
-            <BlockTextarea
+            <Input
+              type="password"
               id={props.id}
               px={16}
               py={10}
@@ -297,7 +299,7 @@ const HomePage = (props) => {
                     as="form"
                     onSubmit={handleCheckout}
                   >
-                    <Flex sx={{ justifyContent: 'space-between' }}>
+                    <Flex sx={{ justifyContent: 'space-between', mb: 1 }}>
                       <Button variant="button_med" type="submit">
                         Process payment
                       </Button>
@@ -320,14 +322,7 @@ const HomePage = (props) => {
                         />
                       </Box>
                     </Flex>
-                    <Input
-                      variant="input_payment_message"
-                      name="message"
-                      id="message"
-                      placeholder="Message"
-                      my={1}
-                      ref={inputRef}
-                    />
+                    <Input name="message" id="message" placeholder="Message" my={1} ref={inputRef} />
                     <Label>
                       <Radio name="flow" value="direct" defaultChecked={true} ref={radioRef} />
                       Direct
@@ -342,7 +337,7 @@ const HomePage = (props) => {
                     </Label>
                     <Label>
                       <Radio name="flow" value="sct" ref={radioRef} />
-                      Separate Charge
+                      Separate Charge (and Transfer with cURL)
                     </Label>
                     {checkoutSession && (
                       <>
@@ -362,6 +357,12 @@ const HomePage = (props) => {
                         }
                       </>
                     )}
+                    <Link
+                      sx={{ fontSize: 1 }}
+                      href="https://stripe.com/docs/connect/creating-a-payments-page?platform=web&ui=checkout#accept-a-payment"
+                    >
+                      Checkout + Connect docs
+                    </Link>
                   </Box>
                 </>
               )}
