@@ -154,9 +154,9 @@ const HomePage = (props) => {
                 setSecretKey(t.target.value);
               }}
             />
-            {platform && platform['settings'] && platform['settings']['dashboard'] && (
+            {platform && platform['business_profile'] && (
               <Badge mx={0} bg={'blue'}>
-                {platform['settings']['dashboard']['display_name']}
+                {platform['business_profile']['name']}
               </Badge>
             )}
             {isValidSecretKey(secretKey) && (
