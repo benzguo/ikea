@@ -301,7 +301,7 @@ const HomePage = (props) => {
                   >
                     <Flex sx={{ justifyContent: 'space-between', mb: 1 }}>
                       <Button variant="button_med" type="submit">
-                        Process payment
+                        Pay with Stripe Checkout
                       </Button>
                     </Flex>
                     <Flex sx={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -322,7 +322,7 @@ const HomePage = (props) => {
                         />
                       </Box>
                     </Flex>
-                    <Input name="message" id="message" placeholder="Message" my={1} ref={inputRef} />
+                    <Input name="message" id="message" placeholder="Description" my={1} ref={inputRef} />
                     <Label>
                       <Radio name="flow" value="direct" defaultChecked={true} ref={radioRef} />
                       Direct
