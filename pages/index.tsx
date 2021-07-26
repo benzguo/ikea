@@ -129,7 +129,7 @@ const HomePage = (props) => {
       <Layout>
         <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>💡 lightbulb</Text>
         <Link sx={{ fontSize: 1, pb: 1, py: 0, my: 0 }} href="https://github.com/benzguo/lightbulb">
-          source
+          github.com/benzguo/lightbulb
         </Link>
         <Card variant="card_dotted_gray" sx={{ my: 4 }}>
           <Box
@@ -203,7 +203,7 @@ const HomePage = (props) => {
                     sx={{ borderColor: 'lightGray', bg: 'lightBlue' }}
                   />
                 )}
-                {account && <Link sx={{fontSize: 1}} href={`https://dashboard.stripe.com/connect/accounts/${accountId}`}>{`https://dashboard.stripe.com/connect/accounts/${accountId}`}</Link>}
+                {account && <Link sx={{fontSize: 1}} href={`https://dashboard.stripe.com/connect/accounts/${accountId}`}>{`dashboard.stripe.com/connect/accounts/${accountId}`}</Link>}
               </Box>
             )}
           </Box>
@@ -348,7 +348,7 @@ const HomePage = (props) => {
                         <Text mt={3}>⚠️ Run this to send a transfer after Separate Charge</Text>
                         {
                           <Textarea
-                            rows={10}
+                            rows={7}
                             sx={{ borderColor: 'lightGray', bg: 'lightBlue' }}
                             defaultValue={`curl https://api.stripe.com/v1/transfers \\ 
 -u ${secretKey}: \\
