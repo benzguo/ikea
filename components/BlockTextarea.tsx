@@ -25,6 +25,7 @@ const BlockTextarea = (props) => {
         fontSize: props.fontSize || '13px',
         border: 'none',
         lineHeight: 1.5,
+        textAlign: 'center',
         paddingLeft: props.px,
         paddingRight: props.px,
         paddingTop: props.py,

@@ -142,6 +142,7 @@ const HomePage = (props) => {
               bg: 'offWhite',
             }}
           >
+            {account && <Link sx={{fontSize: 1}} href={`https://dashboard.stripe.com/apikeys`}>dashboard.stripe.com/apikeys</Link>}
             <Input
               type="password"
               id={props.id}
@@ -153,8 +154,8 @@ const HomePage = (props) => {
                 setSecretKey(t.target.value);
               }}
             />
-            {platform && (
-              <Badge mx={3} bg={'blue'}>
+            {platform && platform['settings'] && platform['settings']['dashboard'] && (
+              <Badge mx={0} bg={'blue'}>
                 {platform['settings']['dashboard']['display_name']}
               </Badge>
             )}
@@ -183,7 +184,7 @@ const HomePage = (props) => {
                     Create account
                   </Button>
                 )}
-                {isValidAccountId(accountId) && <Badge mx={3}>{accountId}</Badge>}
+                {account && <Badge mx={0} sx={{bg: 'purple'}}>{account["email"]}</Badge>}
                 <BlockTextarea
                   id={props.id}
                   px={16}
@@ -194,6 +195,7 @@ const HomePage = (props) => {
                     setAccountId(t.target.value);
                   }}
                 />
+                {account && <Link sx={{fontSize: 1}} href={`https://dashboard.stripe.com/connect/accounts/overview`}>dashboard.stripe.com/connect/accounts/overview</Link>}
                 {account && (
                   <Textarea
                     rows={15}
@@ -201,6 +203,7 @@ const HomePage = (props) => {
                     sx={{ borderColor: 'lightGray', bg: 'lightBlue' }}
                   />
                 )}
+                {account && <Link sx={{fontSize: 1}} href={`https://dashboard.stripe.com/connect/accounts/${accountId}`}>{`https://dashboard.stripe.com/connect/accounts/${accountId}`}</Link>}
               </Box>
             )}
           </Box>
@@ -273,7 +276,8 @@ const HomePage = (props) => {
                               body: JSON.stringify(body),
                             });
                             const url = response.url;
-                            window.location.assign(url);
+                            console.log(url)
+                            // window.location.assign(url);
                           } catch (e) {
                             // TODO: handle error
                           }
