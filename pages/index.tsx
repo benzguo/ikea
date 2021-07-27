@@ -278,7 +278,7 @@ const HomePage = (props) => {
                             });
                             const url = response.url;
                             console.log(url)
-                            // window.location.assign(url);
+                            window.location.assign(url);
                           } catch (e) {
                             // TODO: handle error
                           }
