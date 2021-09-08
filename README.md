@@ -1,8 +1,6 @@
 # 💡 lightbulb
 
-> illuminate your house
-
-## https://lit.lighting
+> https://lightbulb.express
 
 ## Running locally
 
