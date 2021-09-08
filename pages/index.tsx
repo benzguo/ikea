@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import NumberFormat from 'react-number-format';
 import { Box, Card, Button, Text, Flex, Input, Badge, Textarea, Radio, Label, Link } from 'theme-ui';
-import BlockTextarea from '../components/BlockTextarea';
 import fetchJson from '../lib/fetchJson';
 
 const HomePage = (props) => {
@@ -12,8 +11,10 @@ const HomePage = (props) => {
   const [accountId, setAccountId] = useState<string>('');
   const [secretKey, setSecretKey] = useState<string>('');
   const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const [flow, setFlow] = useState<string>('direct');
+  const [accountLink, setAccountLink] = useState<string | null>(null);
+  const [loginLink, setLoginLink] = useState<string | null>(null);
+  const descriptionInputRef = useRef<HTMLInputElement | null>(null);
   const [amount, setAmount] = useState(0.5);
 
   const isValidSecretKey = (key: string): boolean => {
@@ -43,10 +44,11 @@ const HomePage = (props) => {
       fetchCheckoutSession();
       localStorage.setItem('checkout_session_id', checkoutSessionId);
     }
-    if (!accountId || accountId.length === 0) {
+    // no nulls in localStorage
+    if (!accountId) {
       localStorage.setItem('account_id', '');
     }
-    if (!secretKey || secretKey.length === 0) {
+    if (!secretKey) {
       localStorage.setItem('secret_key', '');
     }
   }, [accountId, secretKey, checkoutSessionId]);
@@ -57,10 +59,10 @@ const HomePage = (props) => {
     }
     const body = {
       amount: amount,
-      message: inputRef.current.value,
+      message: descriptionInputRef.current.value,
       secret_key: secretKey,
       account_id: accountId,
-      flow: flow
+      flow: flow,
     };
     console.log(body);
     let checkoutSessionUrl = null;
@@ -128,10 +130,15 @@ const HomePage = (props) => {
   return (
     <>
       <Layout>
-        <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>💡 lightbulb</Text>
-        <Link sx={{ fontSize: 1, pb: 1, py: 0, my: 0 }} href="https://github.com/benzguo/lightbulb">
-          github.com/benzguo/lightbulb
-        </Link>
+        <Flex>
+          <Text sx={{ fontSize: 3, pb: 1, pt: 2, my: 0 }}>💡</Text>
+          <Link sx={{ fontSize: 3, pb: 1, py: 2, my: 0 }} href="https://github.com/benzguo/lightbulb">
+            lightbulb
+          </Link>
+        </Flex>
+        <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>ℹ️ express testing multi-tool</Text>
+        <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>🔒 keys are only stored locally in your browser</Text>
+        <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>🌐 open the console to see API requests & responses</Text>
         <Card variant="card_dotted_gray" sx={{ my: 4 }}>
           <Box
             sx={{
@@ -143,60 +150,120 @@ const HomePage = (props) => {
               bg: 'offWhite',
             }}
           >
-            {account && <Link sx={{fontSize: 1}} href={`https://dashboard.stripe.com/apikeys`}>dashboard.stripe.com/apikeys</Link>}
-            <Input
-              type="password"
-              id={props.id}
-              px={16}
-              py={10}
-              defaultValue={secretKey}
-              placeholder="secret key"
-              onChange={(t) => {
-                setSecretKey(t.target.value);
-              }}
-            />
-            {platform && platform['business_profile'] && (
-              <Badge mx={0} bg={'blue'}>
-                {platform['business_profile']['name']}
-              </Badge>
-            )}
+            <Link sx={{ fontSize: 1 }} href={`https://dashboard.stripe.com/apikeys`}>
+              dashboard.stripe.com/apikeys
+            </Link>
+            <Flex>
+              <Input
+                id={props.id}
+                px={16}
+                py={10}
+                sx={{ fontSize: 12 }}
+                value={secretKey}
+                placeholder="your platform's secret key"
+                onChange={(t) => {
+                  setSecretKey(t.target.value);
+                }}
+              />
+              <Button
+                variant="button_small"
+                mr={2}
+                onClick={async () => {
+                  setSecretKey('');
+                  setAccountId('');
+                  setCheckoutSessionId('');
+                  setPlatform(null);
+                  setAccount(null);
+                  localStorage.setItem('account_id', '');
+                  localStorage.setItem('secret_key', '');
+                  localStorage.setItem('checkout_session_id', '');
+                }}
+              >
+                Clear
+              </Button>
+            </Flex>
+            <Text sx={{ fontSize: 0 }}>^ use a testmode key (livemode is also supported but be careful 💸)</Text>
+
             {isValidSecretKey(secretKey) && (
               <Box>
                 {!isValidAccountId(accountId) && (
+                  <Flex>
+                    <Button
+                      variant="button_med"
+                      mx={3}
+                      my={1}
+                      onClick={async () => {
+                        try {
+                          const body = { secret_key: secretKey };
+                          const response = await fetchJson('/api/create_account', {
+                            method: 'POST',
+                            body: JSON.stringify(body),
+                          });
+                          console.log(response);
+                          setAccountId(response.account_id);
+                        } catch (e) {
+                          // TODO: handle error
+                          console.error(e);
+                          return;
+                        }
+                      }}
+                    >
+                      Create account
+                    </Button>
+                  </Flex>
+                )}
+                <Flex>
+                  <Input
+                    id={props.id}
+                    px={16}
+                    py={10}
+                    sx={{ fontSize: 12 }}
+                    value={accountId}
+                    placeholder="or enter an existing account id"
+                    onChange={(t) => {
+                      setAccountId(t.target.value);
+                    }}
+                  />
                   <Button
-                    variant="button_med"
-                    mx={3}
+                    variant="button_small"
+                    mr={2}
                     onClick={async () => {
-                      try {
-                        const body = { secret_key: secretKey };
-                        const response = await fetchJson('/api/create_account', {
-                          method: 'POST',
-                          body: JSON.stringify(body),
-                        });
-                        console.log(response);
-                        setAccountId(response.account_id);
-                      } catch (e) {
-                        // TODO: handle error
-                        console.error(e);
-                        return;
-                      }
+                      setAccountId('');
+                      setCheckoutSessionId('');
+                      setAccount(null);
+                      localStorage.setItem('secret_key', '');
+                      localStorage.setItem('checkout_session_id', '');
                     }}
                   >
-                    Create account
+                    Clear
                   </Button>
+                </Flex>
+                {!isValidAccountId(accountId) && (
+                  <Flex>
+                    <Text sx={{ fontSize: 0, my: 0, pr: 1 }}>don't remember the ol account ID? look it up</Text>
+                    <Link
+                      sx={{ fontSize: 0, my: 0, py: 0 }}
+                      href={`https://dashboard.stripe.com/connect/accounts/overview`}
+                    >{`in the connect dashboard`}</Link>
+                  </Flex>
                 )}
-                {account && <Badge mx={0} sx={{bg: 'purple'}}>{account["email"]}</Badge>}
-                <BlockTextarea
-                  id={props.id}
-                  px={16}
-                  py={10}
-                  defaultValue={accountId}
-                  placeholder="or enter account id"
-                  onChange={(t) => {
-                    setAccountId(t.target.value);
-                  }}
-                />
-                {account && <Link sx={{fontSize: 1}} href={`https://dashboard.stripe.com/connect/accounts/overview`}>dashboard.stripe.com/connect/accounts/overview</Link>}
+                <Box py={2} />
+                {platform && platform['settings'] && (
+                  <Flex>
+                    <Text sx={{ fontSize: 1, fontWeight: 'bold', mr: 1 }}>Platform:</Text>
+                    <Badge mx={0} bg={'blue'}>
+                      {platform['settings']['dashboard']['display_name']}
+                    </Badge>
+                  </Flex>
+                )}
+                {account && (
+                  <Flex>
+                    <Text sx={{ fontSize: 1, fontWeight: 'bold', mr: 1 }}>Connected account:</Text>
+                    <Badge mx={0} sx={{ bg: 'purple' }}>
+                      {account['email']}
+                    </Badge>
+                  </Flex>
+                )}
                 {account && (
                   <Textarea
                     rows={15}
@@ -204,7 +271,12 @@ const HomePage = (props) => {
                     sx={{ borderColor: 'lightGray', bg: 'lightBlue' }}
                   />
                 )}
-                {account && <Link sx={{fontSize: 1}} href={`https://dashboard.stripe.com/connect/accounts/${accountId}`}>{`dashboard.stripe.com/connect/accounts/${accountId}`}</Link>}
+                {account && (
+                  <Link
+                    sx={{ fontSize: 1 }}
+                    href={`https://dashboard.stripe.com/connect/accounts/${accountId}`}
+                  >{`dashboard.stripe.com/connect/accounts/${accountId}`}</Link>
+                )}
               </Box>
             )}
           </Box>
@@ -237,19 +309,27 @@ const HomePage = (props) => {
                           });
                           console.log(response);
                           url = response.url;
+                          setAccountLink(url);
                         } catch (e) {
                           // TODO: handle error
                           console.error(e);
                           return;
                         }
-                        window.location.assign(url);
+                        setTimeout(function () {
+                          window.location.assign(url);
+                        }, 1500);
                       }}
                     >
                       Open Express Onboarding
                     </Button>
-                    <Text variant="text_xs" sx={{ fpt: 2, color: 'gray' }}>
-                      ^ creates an account_link
+                    <Text sx={{ fontSize: 0 }}>
+                      {accountLink ? 'created account link ... redirecting ...' : '^ creates an account_link'}
                     </Text>
+                    {accountLink && (
+                      <Link sx={{ fontSize: 1 }} href={accountLink}>
+                        {accountLink}
+                      </Link>
+                    )}
                   </>
                 </Box>
               )}
@@ -277,8 +357,11 @@ const HomePage = (props) => {
                               body: JSON.stringify(body),
                             });
                             const url = response.url;
-                            console.log(url)
-                            window.location.assign(url);
+                            console.log(url);
+                            setLoginLink(url);
+                            setTimeout(function () {
+                              window.location.assign(url);
+                            }, 1500);
                           } catch (e) {
                             // TODO: handle error
                           }
@@ -286,9 +369,14 @@ const HomePage = (props) => {
                       >
                         Open Express Dashboard
                       </Button>
-                      <Text variant="text_xs" sx={{ fpt: 2, color: 'gray' }}>
-                        ^ creates a login_link
+                      <Text sx={{ fontSize: 0 }}>
+                        {loginLink ? `created login link ... redirecting ...` : '^ creates a login_link'}
                       </Text>
+                      {loginLink && (
+                        <Link sx={{ fontSize: 1 }} href={loginLink}>
+                          {loginLink}
+                        </Link>
+                      )}
                     </>
                   </Box>
                   <Box
@@ -327,45 +415,83 @@ const HomePage = (props) => {
                         />
                       </Box>
                     </Flex>
-                    <Input name="message" id="message" placeholder="Description" my={1} ref={inputRef} />
+                    <Input name="message" id="message" placeholder="Description" my={1} ref={descriptionInputRef} />
                     <Label>
-                      <Radio name="flow" value="direct" defaultChecked={true} onChange={(event) => {setFlow(event.target.value)}} />
+                      <Radio
+                        name="flow"
+                        value="direct"
+                        defaultChecked={true}
+                        onChange={(event) => {
+                          setFlow(event.target.value);
+                        }}
+                      />
                       Direct
                     </Label>
                     <Label>
-                      <Radio name="flow" value="destination" onChange={(event) => {setFlow(event.target.value)}} />
+                      <Radio
+                        name="flow"
+                        value="destination"
+                        onChange={(event) => {
+                          setFlow(event.target.value);
+                        }}
+                      />
                       Destination
                     </Label>
                     <Label>
-                      <Radio name="flow" value="destination_obo" onChange={(event) => {setFlow(event.target.value)}} />
+                      <Radio
+                        name="flow"
+                        value="destination_obo"
+                        onChange={(event) => {
+                          setFlow(event.target.value);
+                        }}
+                      />
                       Destination On behalf of
                     </Label>
                     <Label>
-                      <Radio name="flow" value="sct" onChange={(event) => {setFlow(event.target.value)}} />
+                      <Radio
+                        name="flow"
+                        value="sct"
+                        onChange={(event) => {
+                          setFlow(event.target.value);
+                        }}
+                      />
                       Separate Charge (and Transfer with cURL)
                     </Label>
-                    {checkoutSession && <Box> 
-                      <Badge sx={{bg: 'green'}}>{checkoutSession['payment_intent']['id']}</Badge> 
-                      <Link href={`https://dashboard.stripe.com/payments/${checkoutSession['payment_intent']['id']}`} sx={{pl: 2, fontSize: 1}}>{`view last payment in Stripe Dashboard`}</Link>
-                    </Box>}
-                    {checkoutSession && checkoutSession['payment_intent'] && checkoutSession['payment_intent']['charges'] && checkoutSession['payment_intent']['charges']['data'] && (
-                      <>
-                        <Text mt={3}>⚠️ Run this to send a transfer after Separate Charge</Text>
-                        {
-                          <Textarea
-                            rows={7}
-                            sx={{ borderColor: 'lightGray', bg: 'lightBlue' }}
-                            defaultValue={`curl https://api.stripe.com/v1/transfers \\
+                    {checkoutSession && (
+                      <Box>
+                        <Badge sx={{ bg: 'green' }}>{checkoutSession['payment_intent']['id']}</Badge>
+                        <Link
+                          href={`https://dashboard.stripe.com/payments/${checkoutSession['payment_intent']['id']}`}
+                          sx={{ pl: 2, fontSize: 1 }}
+                        >{`view last payment in Stripe Dashboard`}</Link>
+                      </Box>
+                    )}
+                    {flow == 'sct' &&
+                      checkoutSession &&
+                      checkoutSession['payment_intent'] &&
+                      checkoutSession['payment_intent']['charges'] &&
+                      checkoutSession['payment_intent']['charges']['data'] && (
+                        <>
+                          <Text sx={{ fontSize: 1, fontStyle: 'italic' }} mt={3}>
+                            ℹ️ Run this command to send a transfer after creating a Separate Charge using the "Pay with
+                            Stripe Checkout" button above. Janky, I know. This just looks up the last charge ID you
+                            created and sets it as the source of the transfer in the curl command.
+                          </Text>
+                          {
+                            <Textarea
+                              rows={10}
+                              sx={{ borderColor: 'lightGray', bg: 'lightBlue' }}
+                              defaultValue={`curl https://api.stripe.com/v1/transfers \\
 -u ${secretKey}: \\
 -d amount=${checkoutSession['payment_intent']['charges']['data'][0]['amount']} \\
 -d currency="usd" \\
--d description="transfer description" \\
+-d description="TRANSFER DESCRIPTION" \\
 -d source_transaction="${checkoutSession['payment_intent']['charges']['data'][0]['id']}" \\
 -d destination="${accountId}"`}
-                          />
-                        }
-                      </>
-                    )}
+                            />
+                          }
+                        </>
+                      )}
                     <Link
                       sx={{ fontSize: 1 }}
                       href="https://stripe.com/docs/connect/creating-a-payments-page?platform=web&ui=checkout#accept-a-payment"
