@@ -88,7 +88,7 @@ export const createCheckoutSession = async (secretKey: string, accountId: string
   const stripe = require('stripe')(secretKey);
 
   console.log("🌊 flow", flow)
-  let returnUrl = `https://lit.lighting`;
+  let returnUrl = `https://lightbulb.express`;
   if (process.env.NODE_ENV === 'development') {
     returnUrl = `http://127.0.0.1:3000`;
   }
@@ -226,7 +226,7 @@ export const createAccountLink = async (secretKey: string, accountId: string): P
   let errorResponse: ErrorResponse | null = null;
   const stripe = require('stripe')(secretKey);
 
-  let returnUrl = `https://lit.lighting`;
+  let returnUrl = `https://lightbulb.express`;
   if (process.env.NODE_ENV === 'development') {
     returnUrl = `http://127.0.0.1:3000`;
   }
