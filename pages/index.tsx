@@ -136,10 +136,57 @@ const HomePage = (props) => {
             lightbulb
           </Link>
         </Flex>
-        <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>ℹ️ express testing multi-tool</Text>
-        <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>🔒 keys are only stored locally in your browser</Text>
-        <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>🌐 open the console to see API requests & responses</Text>
-        <Card variant="card_dotted_gray" sx={{ my: 4 }}>
+        <Text sx={{ fontSize: 2, fontWeight: 'bold', pb: 1, pt: 1, my: 0 }}>Open a demo account:</Text>
+        <Card variant="card_dotted_gray" sx={{ my: 2 }}>
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 4,
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              border: `1px dashed lightBlue`,
+              bg: 'offWhite',
+            }}
+          >
+            <>
+              <Button
+                variant="button_small"
+                mr={2}
+                onClick={async () => {
+                  let url = null;
+                  try {
+                    const body = {
+                      secret_key:
+                        'sk_test_51JWgt8JYChxmpOh2DGndLkvIN7ycMPuQaZvSoDGFPnQ4e4znjzG4icEC0rGckG5m6A1RJG8PoJYNqZWbud8L9yIM00zU6epima',
+                      account_id: 'acct_1Jhj23QrOJhkBAEE',
+                    };
+                    const response = await fetchJson('/api/create_login_link', {
+                      method: 'POST',
+                      body: JSON.stringify(body),
+                    });
+                    console.log(response);
+                    url = response.url;
+                    setAccountLink(url);
+                  } catch (e) {
+                    // TODO: handle error
+                    console.error(e);
+                    return;
+                  }
+                  setTimeout(function () {
+                    window.location.assign(url);
+                  }, 0);
+                }}
+              >
+                bg.tests.express+demo@gmail.com
+              </Button>
+              <Text sx={{ fontSize: 0 }}>^ Full demo account</Text>
+            </>
+          </Box>
+        </Card>
+        <Text sx={{ fontSize: 2, fontWeight: 'bold', pb: 1, pt: 1, my: 0 }}>Or enter your own keys:</Text>
+        <Text sx={{ fontSize: 0, pb: 1, pt: 1, my: 0 }}>🔒 keys are only stored locally in your browser</Text>
+        <Text sx={{ fontSize: 0, pb: 1, pt: 1, my: 0 }}>🌐 open the console to see API requests & responses</Text>
+        <Card variant="card_dotted_gray" sx={{ my: 2 }}>
           <Box
             sx={{
               p: 2,
@@ -282,7 +329,7 @@ const HomePage = (props) => {
           </Box>
         </Card>
         {isValidAccountId(accountId) && (
-          <Card variant="card_dotted_gray" sx={{ my: 4 }}>
+          <Card variant="card_dotted_gray" sx={{ my: 2 }}>
             <Box sx={{ mb: 3 }}>
               {account && !account['charges_enabled'] && (
                 <Box
