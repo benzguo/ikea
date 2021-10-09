@@ -136,7 +136,7 @@ const HomePage = (props) => {
             lightbulb
           </Link>
         </Flex>
-        <Text sx={{ fontSize: 2, fontWeight: 'bold', pb: 1, pt: 1, my: 0 }}>Open a demo account:</Text>
+        <Text sx={{ fontSize: 2, fontWeight: 'bold', pb: 1, pt: 1, my: 0 }}>View a demo user:</Text>
         <Card variant="card_dotted_gray" sx={{ my: 2 }}>
           <Box
             sx={{
@@ -179,7 +179,6 @@ const HomePage = (props) => {
               >
                 bg.tests.express+demo
               </Button>
-              <Text sx={{ fontSize: 0 }}>⬆️ Full demo account</Text>
             </>
           </Box>
         </Card>
