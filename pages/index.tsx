@@ -179,7 +179,7 @@ const HomePage = (props) => {
               >
                 bg.tests.express+demo@gmail.com
               </Button>
-              <Text sx={{ fontSize: 0 }}>^ Full demo account</Text>
+              <Text sx={{ fontSize: 0 }}>⬆️ Full demo account</Text>
             </>
           </Box>
         </Card>
