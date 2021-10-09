@@ -150,7 +150,7 @@ const HomePage = (props) => {
           >
             <>
               <Button
-                variant="button_small"
+                variant="button_med"
                 mr={2}
                 onClick={async () => {
                   let url = null;
@@ -177,7 +177,7 @@ const HomePage = (props) => {
                   }, 0);
                 }}
               >
-                bg.tests.express+demo@gmail.com
+                bg.tests.express+demo
               </Button>
               <Text sx={{ fontSize: 0 }}>⬆️ Full demo account</Text>
             </>
