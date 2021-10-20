@@ -70,8 +70,19 @@ export default {
       border: 'dotted 1px lightGray',
       borderRadius: 12,
       bg: 'white',
+      fontSize: 1,
+      cursor: 'pointer',
+      boxShadow: '0 0 4px rgba(0, 0, 0, 0.125)',
+      '&:hover': {
+        boxShadow: '0 0 16px rgba(0, 0, 0, 0.125)',
+      },
+    },
+    button_emphasis_blue: {
+      py: 2,
+      color: 'white',
+      borderRadius: 12,
+      bg: 'black',
       fontSize: 3,
-      fontFamily: 'mono',
       cursor: 'pointer',
       boxShadow: '0 0 4px rgba(0, 0, 0, 0.125)',
       '&:hover': {
@@ -116,7 +127,7 @@ export default {
       p: 1,
       border: '1px dotted',
       borderColor: 'lightGray',
-      borderRadius: 8,
+      // borderRadius: 8,
       bg: 'lightGray',
     },
     card_dotted_black: {
@@ -137,9 +148,9 @@ export default {
     card_payment_form: {
       p: 3,
       my: 2,
-      bg: 'white',
+      bg: 'lightBlue',
       boxShadow: '0 0 8px rgba(0, 0, 0, 0.125)',
-      borderRadius: 12,
+      // borderRadius: 12,
       border: '1px solid lightGray',
     },
   },

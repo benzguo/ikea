@@ -157,8 +157,8 @@ const HomePage = (props) => {
                   try {
                     const body = {
                       secret_key:
-                        'sk_test_51JWgt8JYChxmpOh2DGndLkvIN7ycMPuQaZvSoDGFPnQ4e4znjzG4icEC0rGckG5m6A1RJG8PoJYNqZWbud8L9yIM00zU6epima',
-                      account_id: 'acct_1Jhj23QrOJhkBAEE',
+                        'sk_test_51JWkRwKYE2rcCQqxoT96He2XIHGBYQXw9iZPGJeYR3A3rirJfn4glbvrKlWPo5GHTqN75OAm5efvHqlWRyUrgwrH00peSaONV9',
+                      account_id: 'acct_1Jhj8OQNd6S9rWR9',
                     };
                     const response = await fetchJson('/api/create_login_link', {
                       method: 'POST',
