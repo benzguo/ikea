@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
-import NumberFormat from 'react-number-format';
-import { Box, Card, Button, Text, Flex, Input, Badge, Textarea, Radio, Label, Link } from 'theme-ui';
+import Head from 'next/head';
+import { Box, Card, Button, Text, Flex, Image, Badge, Textarea, Radio, Label, Link } from 'theme-ui';
 import fetchJson from '../lib/fetchJson';
 
 const HomePage = (props) => {
@@ -130,8 +130,12 @@ const HomePage = (props) => {
   return (
     <>
       <Layout>
-        <Flex>
-          <Text sx={{ fontSize: 5, pb: 1, pt: 2, my: 0, fontWeight: 'bold' }}>🚛 Deliverly Driver Portal</Text>
+        <Head>
+          <title>Deliverly</title>
+        </Head>
+        <Flex sx={{ alignItems: 'center' }}>
+          <Image src={'favicon.png'} variant="avatar" />
+          <Text sx={{ fontSize: 5, pl: 2, pb: 2, pt: 2, my: 0, fontWeight: 'bold' }}> Deliverly Driver Portal</Text>
         </Flex>
         <Card variant="card_payment_form" sx={{ p: 2, my: 2 }}>
           <Flex>

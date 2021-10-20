@@ -14,6 +14,13 @@ export default {
     body: 1.5,
   },
   useLocalStorage: false,
+  images: {
+    avatar: {
+      width: 30,
+      height: 30,
+      borderRadius: 99999,
+    },
+  },
   colors: {
     text: '#000',
     gray: '#718096',
@@ -81,8 +88,8 @@ export default {
       py: 2,
       color: 'white',
       borderRadius: 12,
-      bg: 'black',
-      fontSize: 3,
+      bg: '#0068DD',
+      fontSize: 4,
       cursor: 'pointer',
       boxShadow: '0 0 4px rgba(0, 0, 0, 0.125)',
       '&:hover': {
