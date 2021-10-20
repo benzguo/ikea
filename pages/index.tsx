@@ -180,6 +180,11 @@ const HomePage = (props) => {
                 bg.tests.express+demo
               </Button>
             </>
+            <Box>
+              <Link href="/demo" sx={{ fontSize: 2 }}>
+                Deliverly Driver Portal
+              </Link>
+            </Box>
           </Box>
         </Card>
         <Text sx={{ fontSize: 2, fontWeight: 'bold', pb: 1, pt: 1, my: 0 }}>Or enter your own keys:</Text>
