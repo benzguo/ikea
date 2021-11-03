@@ -384,7 +384,7 @@ const HomePage = (props) => {
                   </>
                 </Box>
               )}
-              {account && account['charges_enabled'] && (
+              {account && (
                 <>
                   <Box
                     sx={{

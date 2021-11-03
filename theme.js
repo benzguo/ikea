@@ -74,10 +74,10 @@ export default {
     button_emphasis: {
       py: 2,
       color: 'text',
-      border: 'dotted 1px lightGray',
+      border: 'solid 1px lightGray',
       borderRadius: 12,
       bg: 'white',
-      fontSize: 1,
+      fontSize: 2,
       cursor: 'pointer',
       boxShadow: '0 0 4px rgba(0, 0, 0, 0.125)',
       '&:hover': {
@@ -134,7 +134,7 @@ export default {
       p: 1,
       border: '1px dotted',
       borderColor: 'lightGray',
-      // borderRadius: 8,
+      borderRadius: 12,
       bg: 'lightGray',
     },
     card_dotted_black: {

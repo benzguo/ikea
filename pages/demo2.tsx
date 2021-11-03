@@ -133,7 +133,7 @@ const HomePage = (props) => {
         <Head>
           <title>Deliverly</title>
         </Head>
-        <Flex sx={{ alignItems: 'center' }}>
+        <Flex sx={{ alignItems: 'center', my: 3 }}>
           <Image src={'favicon.png'} variant="avatar" />
           <Text sx={{ fontSize: 5, pl: 2, pb: 2, pt: 2, my: 0, fontWeight: 'bold' }}> Deliverly Driver Portal</Text>
         </Flex>
@@ -148,7 +148,7 @@ const HomePage = (props) => {
             <Button variant="button_emphasis_blue">Schedule a drive</Button>
           </Flex>
         </Card>
-        <Card variant="card_dotted_gray" sx={{ p: 3, my: 3 }}>
+        <Card variant="card_dotted_gray" sx={{ p: 3, my: 4 }}>
           <Text sx={{ fontSize: 2, pb: 3 }}>
             Deliverly partners with Stripe for payouts. Go to your Stripe Express dashboard to view payout information
             and manage your Stripe account.
@@ -162,7 +162,7 @@ const HomePage = (props) => {
                 const body = {
                   secret_key:
                     'sk_test_51JWgt8JYChxmpOh2DGndLkvIN7ycMPuQaZvSoDGFPnQ4e4znjzG4icEC0rGckG5m6A1RJG8PoJYNqZWbud8L9yIM00zU6epima',
-                  account_id: 'acct_1Jhj23QrOJhkBAEE',
+                  account_id: 'acct_1JrY6iQp5q3RBDxe',
                 };
                 const response = await fetchJson('/api/create_login_link', {
                   method: 'POST',
