@@ -607,7 +607,12 @@ const HomePage = (props) => {
                     </Button>
                   </Flex>
                   <Text sx={{ fontSize: 0 }}>
-                    Create a transfer from your platform balance. Balance will be available immediately.
+                    Create a transfer from your platform balance. Balance will be available immediately. You may need to
+                    add to your platform balance in the
+                    <Link sx={{ pl: 1, fontSize: 0 }} href="https://dashboard.stripe.com/test/balance/overview">
+                      Stripe Dashboard
+                    </Link>
+                    .
                   </Text>
                   {transferId && <Text sx={{ fontSize: 0 }}>{'⏲ Created transfer: ' + transferId}</Text>}
                 </Box>
