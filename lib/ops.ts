@@ -1,19 +1,33 @@
 import { ErrorResponse, AnyResponse } from './typedefs';
 
-export const createAccount = async (secretKey: string): Promise<AnyResponse> => {
+export const createAccount = async (
+  secretKey: string,
+  bizType: string,
+  xpType: string,
+  capabilities: string,
+  email: string | null,
+): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
   const stripe = require('stripe')(secretKey);
-
+  let caps: object = {
+    card_payments: { requested: true },
+    transfers: { requested: true },
+  };
+  if (capabilities === 'transfers_only') {
+    caps = {
+      transfers: { requested: true },
+    };
+  }
   try {
     console.log('Creating Stripe account');
     const account = await stripe.accounts.create({
-      type: 'express',
-      business_type: 'individual',
-      capabilities: {
-        card_payments: { requested: true },
-        transfers: { requested: true },
-      },
+      type: xpType,
+      business_type: bizType,
+      capabilities: caps,
+      email: email,
+      settings: { payouts: { schedule: { interval: 'manual' } } },
+      business_profile: { product_description: 'lightbulb marketplace' },
     });
     dataResponse = { account_id: account.id };
   } catch (e) {
@@ -59,6 +73,34 @@ export const getAccount = async (secretKey: string, accountId: string | null): P
   return response;
 };
 
+export const getBalance = async (secretKey: string, accountId: string | null): Promise<AnyResponse> => {
+  let dataResponse: object | null = null;
+  let errorResponse: ErrorResponse | null = null;
+  const stripe = require('stripe')(secretKey);
+
+  try {
+    let balance = null;
+    if (accountId) {
+      balance = await stripe.balance.retrieve({ stripeAccount: accountId });
+    } else {
+      throw 'account id is null';
+    }
+    dataResponse = { balance: balance };
+  } catch (e) {
+    errorResponse = {
+      httpStatus: 500,
+      errorMessage: e.message,
+      errorCode: 'stripe_exception',
+    };
+  }
+  const response = {
+    errored: errorResponse != null,
+    data: errorResponse ? errorResponse : dataResponse,
+  };
+  console.log('response', response);
+  return response;
+};
+
 export const getCheckoutSession = async (secretKey: string, sessionId: string): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
@@ -82,18 +124,24 @@ export const getCheckoutSession = async (secretKey: string, sessionId: string): 
   return response;
 };
 
-export const createCheckoutSession = async (secretKey: string, accountId: string, amount: number, message: string | null, flow: string): Promise<AnyResponse> => {
+export const createCheckoutSession = async (
+  secretKey: string,
+  accountId: string,
+  amount: number,
+  message: string | null,
+  flow: string,
+): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
   const stripe = require('stripe')(secretKey);
 
-  console.log("🌊 flow", flow)
+  console.log('🌊 flow', flow);
   let returnUrl = `https://lightbulb.express`;
   if (process.env.NODE_ENV === 'development') {
     returnUrl = `http://127.0.0.1:3000`;
   }
   try {
-    console.log('Creating account link ' + returnUrl);
+    console.log('Creating checkout session ' + returnUrl);
     const productData = { name: 'tip' };
     if (message) {
       productData['description'] = message;
@@ -121,7 +169,7 @@ export const createCheckoutSession = async (secretKey: string, accountId: string
         cancel_url: returnUrl,
         submit_type: 'donate',
       };
-      console.log("params", checkoutParams);
+      console.log('params', checkoutParams);
       checkoutSession = await stripe.checkout.sessions.create(checkoutParams, {
         stripeAccount: accountId,
       });
@@ -150,7 +198,7 @@ export const createCheckoutSession = async (secretKey: string, accountId: string
         cancel_url: returnUrl,
         submit_type: 'donate',
       };
-      console.log("params", checkoutParams);
+      console.log('params', checkoutParams);
       checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
     } else if (flow === 'destination_obo') {
       const checkoutParams = {
@@ -178,7 +226,7 @@ export const createCheckoutSession = async (secretKey: string, accountId: string
         cancel_url: returnUrl,
         submit_type: 'donate',
       };
-      console.log("params", checkoutParams);
+      console.log('params', checkoutParams);
       checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
     } else if (flow === 'sct') {
       const checkoutParams = {
@@ -201,7 +249,7 @@ export const createCheckoutSession = async (secretKey: string, accountId: string
         cancel_url: returnUrl,
         submit_type: 'donate',
       };
-      console.log("params", checkoutParams);
+      console.log('params', checkoutParams);
       checkoutSession = await stripe.checkout.sessions.create(checkoutParams);
     }
     const checkoutSessionId = checkoutSession.id;
@@ -262,6 +310,100 @@ export const createLoginLink = async (secretKey: string, accountId: string): Pro
     console.log('Creating login link');
     const link = await stripe.accounts.createLoginLink(accountId);
     dataResponse = { url: link.url };
+  } catch (e) {
+    errorResponse = {
+      httpStatus: 500,
+      errorMessage: e.message,
+      errorCode: 'stripe_exception',
+    };
+  }
+  const response = {
+    errored: errorResponse != null,
+    data: errorResponse ? errorResponse : dataResponse,
+  };
+  return response;
+};
+
+export const sendFunds = async (secretKey: string, accountId: string, amount: number): Promise<AnyResponse> => {
+  let dataResponse: object | null = null;
+  let errorResponse: ErrorResponse | null = null;
+  const stripe = require('stripe')(secretKey);
+  try {
+    const params = {
+      amount: ~~(amount * 100),
+      currency: 'usd',
+      destination: accountId,
+    };
+    console.log('Creating transfer ' + JSON.stringify(params, null, 2));
+    const transfer = await stripe.transfers.create(params);
+    dataResponse = { transfer: transfer.id };
+  } catch (e) {
+    errorResponse = {
+      httpStatus: 500,
+      errorMessage: e.message,
+      errorCode: 'stripe_exception',
+    };
+  }
+  const response = {
+    errored: errorResponse != null,
+    data: errorResponse ? errorResponse : dataResponse,
+  };
+  return response;
+};
+
+export const createPayout = async (secretKey: string, accountId: string, amount: number): Promise<AnyResponse> => {
+  let dataResponse: object | null = null;
+  let errorResponse: ErrorResponse | null = null;
+  const stripe = require('stripe')(secretKey);
+  try {
+    console.log('Creating payout ');
+    const payout = await stripe.payouts.create(
+      {
+        amount: ~~(amount * 100),
+        currency: 'usd',
+        destination: 'tok_visa_debit_us_transferSuccess',
+      },
+      {
+        stripeAccount: accountId,
+      },
+    );
+    dataResponse = { payout: payout.id };
+  } catch (e) {
+    errorResponse = {
+      httpStatus: 500,
+      errorMessage: e.message,
+      errorCode: 'stripe_exception',
+    };
+  }
+  const response = {
+    errored: errorResponse != null,
+    data: errorResponse ? errorResponse : dataResponse,
+  };
+  return response;
+};
+
+export const createCharge = async (
+  secretKey: string,
+  accountId: string,
+  amount: number,
+  description: string,
+): Promise<AnyResponse> => {
+  let dataResponse: object | null = null;
+  let errorResponse: ErrorResponse | null = null;
+  const stripe = require('stripe')(secretKey);
+  try {
+    console.log('Creating charge ');
+    const charge = await stripe.charges.create({
+      amount: ~~(amount * 100),
+      currency: 'usd',
+      description: description,
+      application_fee_amount: 10,
+      source: 'tok_visa',
+      transfer_data: {
+        destination: accountId,
+      },
+    });
+    dataResponse = { charge: charge.id };
   } catch (e) {
     errorResponse = {
       httpStatus: 500,

@@ -1,19 +1,18 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createAccount } from '../../lib/ops';
 import { ErrorResponse } from '../../lib/typedefs';
+import { sendFunds } from '../../lib/ops';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return;
   }
+
   const params = JSON.parse(req.body);
   const secretKey = params.secret_key;
-  const bizType = params.biz_type;
-  const xpType = params.xp_type;
-  const capabilities = params.capabilities;
-  const email = params.email;
+  const accountId = params.account_id;
+  const amount = params.amount;
 
-  const response = await createAccount(secretKey, bizType, xpType, capabilities, email);
+  const response = await sendFunds(secretKey, accountId, amount);
   if (response.errored) {
     const errorResponse: ErrorResponse = {
       errorCode: 'op_error',

@@ -135,10 +135,10 @@ export default {
       borderRadius: 12,
       bg: 'lightGray',
     },
-    card_dotted_black: {
+    card_dotted_green: {
       p: 3,
-      border: '1px dotted',
-      borderColor: 'black',
+      border: '2px dotted',
+      borderColor: 'yellow',
       borderRadius: 8,
       bg: 'transparent',
     },
@@ -165,9 +165,9 @@ export default {
     },
     input: {
       // PaymentBlock amount input
-      fontSize: 3,
+      fontSize: 4,
       fontWeight: 'bold',
-      bg: 'transparent',
+      bg: 'white',
       borderWidth: 0,
       textAlign: 'center',
       py: 1,
