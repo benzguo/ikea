@@ -8,6 +8,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
   const params = JSON.parse(req.body);
   const secretKey = params.secret_key;
+  const bizType = params.biz_type;
+  const xpType = params.xp_type;
+  const capabilities = params.capabilities;
 
   const response = await createAccount(secretKey);
   if (response.errored) {

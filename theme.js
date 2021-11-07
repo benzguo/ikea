@@ -51,7 +51,6 @@ export default {
       borderWidth: 1,
       bg: 'transparent',
       fontSize: 0,
-      fontFamily: 'mono',
       cursor: 'pointer',
       '&:hover': {
         boxShadow: '0 0 16px rgba(0, 0, 0, 0.125)',
@@ -60,12 +59,11 @@ export default {
     button_med: {
       px: 2,
       py: 1,
-      color: 'text',
-      border: 'solid black',
+      color: 'white',
+      border: 'solid darkGray',
       borderWidth: 2,
-      bg: 'lightBlue',
-      fontSize: 3,
-      fontFamily: 'mono',
+      bg: 'black',
+      fontSize: 2,
       cursor: 'pointer',
       '&:hover': {
         boxShadow: '0 0 16px rgba(0, 0, 0, 0.125)',
@@ -183,7 +181,7 @@ export default {
       border: '1px solid lightGray',
     },
     label: {
-      fontSize: 3,
+      fontSize: 1,
     },
     label_icon_button: {
       fontSize: 0,

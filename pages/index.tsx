@@ -8,10 +8,14 @@ const HomePage = (props) => {
   const [account, setAccount] = useState<object | null>(null);
   const [platform, setPlatform] = useState<object | null>(null);
   const [checkoutSession, setCheckoutSession] = useState<object | null>(null);
+  const [createAccountError, setCreateAccountError] = useState<object | null>(null);
   const [accountId, setAccountId] = useState<string>('');
   const [secretKey, setSecretKey] = useState<string>('');
   const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
   const [flow, setFlow] = useState<string>('direct');
+  const [xpType, setXpType] = useState<string>('express');
+  const [bizType, setBizType] = useState<string>('individual');
+  const [capabilities, setCapabilities] = useState<string>('payments_transfers');
   const [accountLink, setAccountLink] = useState<string | null>(null);
   const [loginLink, setLoginLink] = useState<string | null>(null);
   const descriptionInputRef = useRef<HTMLInputElement | null>(null);
@@ -148,38 +152,6 @@ const HomePage = (props) => {
               bg: 'offWhite',
             }}
           >
-            <>
-              <Button
-                variant="button_med"
-                mr={2}
-                onClick={async () => {
-                  let url = null;
-                  try {
-                    const body = {
-                      secret_key:
-                        'sk_test_51JWkRwKYE2rcCQqxoT96He2XIHGBYQXw9iZPGJeYR3A3rirJfn4glbvrKlWPo5GHTqN75OAm5efvHqlWRyUrgwrH00peSaONV9',
-                      account_id: 'acct_1Jhj8OQNd6S9rWR9',
-                    };
-                    const response = await fetchJson('/api/create_login_link', {
-                      method: 'POST',
-                      body: JSON.stringify(body),
-                    });
-                    console.log(response);
-                    url = response.url;
-                    setAccountLink(url);
-                  } catch (e) {
-                    // TODO: handle error
-                    console.error(e);
-                    return;
-                  }
-                  setTimeout(function () {
-                    window.location.assign(url);
-                  }, 0);
-                }}
-              >
-                bg.tests.express+demo
-              </Button>
-            </>
             <Box>
               <Link href="/demo" sx={{ fontSize: 2 }}>
                 Deliverly Driver Portal
@@ -233,35 +205,128 @@ const HomePage = (props) => {
                 Clear
               </Button>
             </Flex>
-            <Text sx={{ fontSize: 0 }}>^ use a testmode key (livemode is also supported but be careful 💸)</Text>
 
             {isValidSecretKey(secretKey) && (
               <Box>
                 {!isValidAccountId(accountId) && (
-                  <Flex>
-                    <Button
-                      variant="button_med"
-                      mx={3}
-                      my={1}
-                      onClick={async () => {
-                        try {
-                          const body = { secret_key: secretKey };
-                          const response = await fetchJson('/api/create_account', {
-                            method: 'POST',
-                            body: JSON.stringify(body),
-                          });
-                          console.log(response);
-                          setAccountId(response.account_id);
-                        } catch (e) {
-                          // TODO: handle error
-                          console.error(e);
-                          return;
-                        }
+                  <Card variant="card_dotted_gray" sx={{ my: 2 }}>
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: 4,
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        border: `1px dashed lightBlue`,
+                        bg: 'offWhite',
                       }}
                     >
-                      Create account
-                    </Button>
-                  </Flex>
+                      <Flex>
+                        <Box>
+                          <Label>experience type</Label>
+                          <Box>
+                            <Label>
+                              <Radio
+                                name="xptype"
+                                value="express"
+                                defaultChecked={true}
+                                onChange={(event) => {
+                                  setXpType(event.target.value);
+                                }}
+                              />
+                              Express
+                            </Label>
+                            <Label>
+                              <Radio
+                                name="xptype"
+                                value="custom"
+                                onChange={(event) => {
+                                  setXpType(event.target.value);
+                                }}
+                              />
+                              Custom
+                            </Label>
+                            <Button
+                              variant="button_med"
+                              mt={3}
+                              onClick={async () => {
+                                try {
+                                  const body = {
+                                    secret_key: secretKey,
+                                    biz_type: bizType,
+                                    xp_type: xpType,
+                                    capabilities: capabilities,
+                                  };
+                                  const response = await fetchJson('/api/create_account', {
+                                    method: 'POST',
+                                    body: JSON.stringify(body),
+                                  });
+                                  console.log(response);
+                                  setAccountId(response.account_id);
+                                  setCreateAccountError(null);
+                                } catch (e) {
+                                  console.error(e);
+                                  setCreateAccountError(e);
+                                  return;
+                                }
+                              }}
+                            >
+                              🪄 Create account
+                            </Button>
+                          </Box>
+                        </Box>
+                        <Box sx={{ pl: 3 }}>
+                          <Label>business type</Label>
+                          <Box>
+                            <Label>
+                              <Radio
+                                name="biztype"
+                                value="individual"
+                                defaultChecked={true}
+                                onChange={(event) => {
+                                  setBizType(event.target.value);
+                                }}
+                              />
+                              individual
+                            </Label>
+                            <Label>
+                              <Radio
+                                name="biztype"
+                                value="company"
+                                onChange={(event) => {
+                                  setBizType(event.target.value);
+                                }}
+                              />
+                              company
+                            </Label>
+                            <Label>capabilities</Label>
+                            <Box>
+                              <Label>
+                                <Radio
+                                  name="capabilities"
+                                  value="payments_transfers"
+                                  defaultChecked={true}
+                                  onChange={(event) => {
+                                    setCapabilities(event.target.value);
+                                  }}
+                                />
+                                payments+transfers
+                              </Label>
+                              <Label>
+                                <Radio
+                                  name="capabilities"
+                                  value="transfers_only"
+                                  onChange={(event) => {
+                                    setCapabilities(event.target.value);
+                                  }}
+                                />
+                                transfers only
+                              </Label>
+                            </Box>
+                          </Box>
+                        </Box>
+                      </Flex>
+                    </Box>
+                  </Card>
                 )}
                 <Flex>
                   <Input
@@ -289,15 +354,6 @@ const HomePage = (props) => {
                     Clear
                   </Button>
                 </Flex>
-                {!isValidAccountId(accountId) && (
-                  <Flex>
-                    <Text sx={{ fontSize: 0, my: 0, pr: 1 }}>don't remember the ol account ID? look it up</Text>
-                    <Link
-                      sx={{ fontSize: 0, my: 0, py: 0 }}
-                      href={`https://dashboard.stripe.com/connect/accounts/overview`}
-                    >{`in the connect dashboard`}</Link>
-                  </Flex>
-                )}
                 <Box py={2} />
                 {platform && platform['settings'] && (
                   <Flex>
@@ -315,6 +371,13 @@ const HomePage = (props) => {
                     </Badge>
                   </Flex>
                 )}
+                {createAccountError && (
+                  <Textarea
+                    rows={15}
+                    defaultValue={JSON.stringify(createAccountError, null, 2)}
+                    sx={{ borderColor: 'lightRed', bg: 'lightRed' }}
+                  />
+                )}
                 {account && (
                   <Textarea
                     rows={15}
@@ -330,6 +393,17 @@ const HomePage = (props) => {
                 )}
               </Box>
             )}
+          </Box>
+          <Box sx={{ p: 2 }}>
+            <Text sx={{ fontSize: 0, my: 0, pr: 1, fontWeight: 'bold' }}>
+              Why can't I sign into <Link href="https://express.stripe.com/">express.stripe.com</Link> or the mobile app
+              after onboarding a testmode account?
+            </Text>
+            <Text sx={{ fontSize: 0, my: 0, pr: 1 }}>
+              To persist a testmode account, first <Link href="https://dashboard.stripe.com/register">sign up</Link> for
+              a direct Stripe account with the email you want to claim. Then, onboard the account to Express, using the
+              same email you just used.
+            </Text>
           </Box>
         </Card>
         {isValidAccountId(accountId) && (
