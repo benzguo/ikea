@@ -260,6 +260,16 @@ const HomePage = (props) => {
                               />
                               Custom
                             </Label>
+                            <Label>
+                              <Radio
+                                name="xptype"
+                                value="standard"
+                                onChange={(event) => {
+                                  setXpType(event.target.value);
+                                }}
+                              />
+                              Standard
+                            </Label>
                             <Input
                               placeholder="email"
                               sx={{ fontSize: 0, mt: 2 }}
@@ -486,7 +496,7 @@ const HomePage = (props) => {
                       }, 1500);
                     }}
                   >
-                    🚪 Open Express Onboarding
+                    🚪 Open Connect Onboarding
                   </Button>
                   <Text sx={{ fontSize: 0 }}>
                     {accountLink ? '⏲ created account link ...' : '^ creates an account_link'}
@@ -710,8 +720,28 @@ const HomePage = (props) => {
                       💳 Create charge
                     </Button>
                   </Flex>
-                  <Text sx={{ fontSize: 0 }}>Create a destination charge. Balance will be pending. Testmode only.</Text>
+                  {chargeId && (
+                    <Box>
+                      <Badge sx={{ bg: 'green' }}>{chargeId}</Badge>
+                    </Box>
+                  )}
                   {chargeId && <Text sx={{ fontSize: 0 }}>{'⏲ Created charge: ' + chargeId}</Text>}
+                  <Text sx={{ fontSize: 0 }}>
+                    Create a destination charge. The description can be displayed in the Express dashboard (opt-in by
+                    platform). Balance will be pending. Testmode only.
+                  </Text>
+                </Box>
+                <Box
+                  sx={{
+                    mt: 0,
+                    p: 2,
+                    borderRadius: 4,
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    border: `1px dashed lightBlue`,
+                    bg: 'offWhite',
+                  }}
+                >
                   <Flex sx={{ justifyContent: 'space-between', mt: 2, mb: 1 }}>
                     <Button
                       variant="button_med"
@@ -727,10 +757,6 @@ const HomePage = (props) => {
                   {checkoutSession && (
                     <Box>
                       <Badge sx={{ bg: 'green' }}>{checkoutSession['payment_intent']['id']}</Badge>
-                      <Link
-                        href={`https://dashboard.stripe.com/payments/${checkoutSession['payment_intent']['id']}`}
-                        sx={{ pl: 2, fontSize: 1 }}
-                      >{`view last payment in Stripe Dashboard`}</Link>
                     </Box>
                   )}
                   <Text sx={{ fontSize: 0 }}>

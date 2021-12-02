@@ -21,14 +21,17 @@ export const createAccount = async (
   }
   try {
     console.log('Creating Stripe account');
-    const account = await stripe.accounts.create({
+    const params = {
       type: xpType,
       business_type: bizType,
-      capabilities: caps,
       email: email,
       settings: { payouts: { schedule: { interval: 'manual' } } },
       business_profile: { product_description: 'lightbulb marketplace' },
-    });
+    };
+    if (xpType !== 'standard') {
+      params['capabilities'] = caps;
+    }
+    const account = await stripe.accounts.create(params);
     dataResponse = { account_id: account.id };
   } catch (e) {
     errorResponse = {
@@ -403,7 +406,20 @@ export const createCharge = async (
         destination: accountId,
       },
     });
-    dataResponse = { charge: charge.id };
+    if (description && description.length > 0) {
+      const transferId = charge.transfer;
+      const transfer = await stripe.transfers.retrieve(transferId);
+      const chargeId = transfer.destination_payment;
+      console.log('updating charge');
+      const updatedCharge = await stripe.charges.update(
+        chargeId,
+        { description: description },
+        { stripe_account: accountId },
+      );
+      dataResponse = { charge: updatedCharge.id };
+    } else {
+      dataResponse = { charge: charge.id };
+    }
   } catch (e) {
     errorResponse = {
       httpStatus: 500,
