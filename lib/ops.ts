@@ -1,4 +1,5 @@
 import { ErrorResponse, AnyResponse } from './typedefs';
+require('dotenv').config();
 
 export const createAccount = async (
   secretKey: string,
@@ -9,7 +10,7 @@ export const createAccount = async (
 ): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
   let caps: object = {
     card_payments: { requested: true },
     transfers: { requested: true },
@@ -51,7 +52,7 @@ export const createAccount = async (
 export const getAccount = async (secretKey: string, accountId: string | null): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
 
   try {
     let account = null;
@@ -79,7 +80,7 @@ export const getAccount = async (secretKey: string, accountId: string | null): P
 export const getBalance = async (secretKey: string, accountId: string | null): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
 
   try {
     let balance = null;
@@ -107,7 +108,7 @@ export const getBalance = async (secretKey: string, accountId: string | null): P
 export const getCheckoutSession = async (secretKey: string, sessionId: string): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
 
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['payment_intent'] });
@@ -136,7 +137,7 @@ export const createCheckoutSession = async (
 ): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
 
   console.log('🌊 flow', flow);
   let returnUrl = `https://lightbulb.express`;
@@ -275,7 +276,7 @@ export const createCheckoutSession = async (
 export const createAccountLink = async (secretKey: string, accountId: string): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
 
   let returnUrl = `https://lightbulb.express`;
   if (process.env.NODE_ENV === 'development') {
@@ -308,7 +309,7 @@ export const createAccountLink = async (secretKey: string, accountId: string): P
 export const createLoginLink = async (secretKey: string, accountId: string): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
   try {
     console.log('Creating login link');
     const link = await stripe.accounts.createLoginLink(accountId);
@@ -330,7 +331,7 @@ export const createLoginLink = async (secretKey: string, accountId: string): Pro
 export const sendFunds = async (secretKey: string, accountId: string, amount: number): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
   try {
     const params = {
       amount: ~~(amount * 100),
@@ -357,7 +358,7 @@ export const sendFunds = async (secretKey: string, accountId: string, amount: nu
 export const createPayout = async (secretKey: string, accountId: string, amount: number): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
   try {
     console.log('Creating payout ');
     const payout = await stripe.payouts.create(
@@ -393,7 +394,7 @@ export const createCharge = async (
 ): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey);
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
   try {
     console.log('Creating charge ');
     const charge = await stripe.charges.create({
