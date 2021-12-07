@@ -12,7 +12,7 @@ export const createAccount = async (
   let errorResponse: ErrorResponse | null = null;
   const stripe = require('stripe')(secretKey, { host: process.env.HOST });
   let caps: object = {
-    legacy_payments: { requested: true },
+    // legacy_payments: { requested: true },
     card_payments: { requested: true },
     transfers: { requested: true },
   };
