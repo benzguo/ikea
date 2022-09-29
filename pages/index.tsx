@@ -143,12 +143,21 @@ const HomePage = (props) => {
     }
   };
 
+  const loadConnectJs = `
+  StripeConnect.init({
+    publishableKey: "pk_test_TYooMQauvdEDq54NiTphI7jx",
+    clientSecret: "TODO",
+  }); 
+  `;
+
   return (
     <>
       <Layout>
+        <script src="https://b.stripecdn.com/connect-js/v0.1/connect.js"></script>
+        <script dangerouslySetInnerHTML={{__html: loadConnectJs}} />
         <Flex>
-          <Text sx={{ fontSize: 3, pb: 1, pt: 2, my: 0 }}>💡</Text>
-          <Link sx={{ fontSize: 3, pb: 1, py: 2, my: 0 }} href="https://github.com/benzguo/lightbulb">
+          <Text sx={{ fontSize: 2, pb: 1, pt: 2, my: 0 }}>💡</Text>
+          <Link sx={{ fontSize: 2, pb: 1, py: 2, my: 0 }} href="https://github.com/benzguo/lightbulb">
             lightbulb
           </Link>
         </Flex>
@@ -774,6 +783,7 @@ const HomePage = (props) => {
                 />
               </Box>
             )}
+            <stripe-payments-experience></stripe-payments-experience>
           </Card>
         )}
       </Layout>
