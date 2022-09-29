@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getAccount } from '../../../lib/ops';
+import { getAccount, createAccountSession } from '../../../lib/ops';
 import { ErrorResponse } from '../../../lib/typedefs';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -9,6 +9,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     query: { params },
   } = req;
+
+  // returns platform account object if no ID provided
   const secretKey = params[0] as string;
   const accountId = params[1] as string;
 
@@ -21,7 +23,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     };
     return res.status(errorResponse.httpStatus).json(errorResponse);
   }
-  const sessionResponse = await getAccount(secretKey, accountId);
+  if (!accountId) {
+    return res.json(accountResponse);
+  }
+
+  const sessionResponse = await createAccountSession(secretKey, accountId);
   if (sessionResponse.errored) {
     const errorResponse: ErrorResponse = {
       errorCode: 'op_error',
@@ -34,6 +40,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     ...accountResponse.data,
     ...sessionResponse.data
   }
-
   return res.json(response);
 };

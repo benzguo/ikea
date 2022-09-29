@@ -81,10 +81,23 @@ export const getAccount = async (secretKey: string, accountId: string | null): P
 export const createAccountSession = async (secretKey: string, accountId: string): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;
-  const stripe = require('stripe')(secretKey, {apiVersion: '2022-08-01; embedded_connect_beta=v1', host: process.env.HOST });
-
+  const stripe = require('stripe')(secretKey, { host: process.env.HOST });
+  const accountSessionResource = stripe.StripeResource.extend({
+    create: stripe.StripeResource.method({
+      method: 'POST',
+      path: '/account_sessions',
+    }),
+  });
+  const STRIPE_API_VERSION = '2020-08-27';
   try {
-    dataResponse = await stripe.accountSessions.create(accountId);
+    dataResponse = await new accountSessionResource(
+      stripe,
+    ).create({
+      account: accountId,
+    },
+    {
+      apiVersion: `${STRIPE_API_VERSION}; embedded_connect_beta=v1`,
+    })
   } catch (e) {
     errorResponse = {
       httpStatus: 500,
