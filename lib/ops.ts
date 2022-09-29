@@ -78,6 +78,28 @@ export const getAccount = async (secretKey: string, accountId: string | null): P
   return response;
 };
 
+export const createAccountSession = async (secretKey: string, accountId: string): Promise<AnyResponse> => {
+  let dataResponse: object | null = null;
+  let errorResponse: ErrorResponse | null = null;
+  const stripe = require('stripe')(secretKey, {apiVersion: '2022-08-01; embedded_connect_beta=v1', host: process.env.HOST });
+
+  try {
+    dataResponse = await stripe.accountSessions.create(accountId);
+  } catch (e) {
+    errorResponse = {
+      httpStatus: 500,
+      errorMessage: e.message,
+      errorCode: 'stripe_exception',
+    };
+  }
+  const response = {
+    errored: errorResponse != null,
+    data: errorResponse ? errorResponse : dataResponse,
+  };
+  console.log('response', response);
+  return response;
+};
+
 export const getBalance = async (secretKey: string, accountId: string | null): Promise<AnyResponse> => {
   let dataResponse: object | null = null;
   let errorResponse: ErrorResponse | null = null;

@@ -12,14 +12,28 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const secretKey = params[0] as string;
   const accountId = params[1] as string;
 
-  const response = await getAccount(secretKey, accountId);
-  if (response.errored) {
+  const accountResponse = await getAccount(secretKey, accountId);
+  if (accountResponse.errored) {
     const errorResponse: ErrorResponse = {
       errorCode: 'op_error',
-      errorMessage: response.data['errorMessage'],
+      errorMessage: accountResponse.data['errorMessage'],
       httpStatus: 500,
     };
     return res.status(errorResponse.httpStatus).json(errorResponse);
   }
-  return res.json(response.data);
+  const sessionResponse = await getAccount(secretKey, accountId);
+  if (sessionResponse.errored) {
+    const errorResponse: ErrorResponse = {
+      errorCode: 'op_error',
+      errorMessage: sessionResponse.data['errorMessage'],
+      httpStatus: 500,
+    };
+    return res.status(errorResponse.httpStatus).json(errorResponse);
+  }
+  const response = {
+    ...accountResponse.data,
+    ...sessionResponse.data
+  }
+
+  return res.json(response);
 };

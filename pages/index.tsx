@@ -152,7 +152,7 @@ const HomePage = (props) => {
             lightbulb
           </Link>
         </Flex>
-        <Text sx={{ fontSize: 2, fontWeight: 'bold', pb: 1, pt: 1, my: 0 }}>View a demo user:</Text>
+        <Text sx={{ fontSize: 2, fontWeight: 'bold', pb: 1, pt: 1, my: 0 }}>Express demo:</Text>
         <Card variant="card_dotted_gray" sx={{ my: 2 }}>
           <Box
             sx={{
